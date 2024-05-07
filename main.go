@@ -21,12 +21,11 @@ func main() {
 		wg.Add(2)
 
 		println("starting...")
-		say("Hello", 1000, &wg)
-		println("middle...")
-		say("World", 2000, &wg)
-		println("end...")
+		go say("World", 2000, &wg)
+		go say("Hello", 1000, &wg)
 
 		wg.Wait()
+		println("end...")
 
 		return c.String(http.StatusOK, "Done")
 	})
