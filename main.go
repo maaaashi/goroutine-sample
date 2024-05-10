@@ -65,8 +65,6 @@ func main() {
 		todoChannel := make(chan Todo)
 		go GetTodo(todoChannel)
 
-		println("end...")
-
 		userInfo := <-infoChannel
 		todo := <-todoChannel
 
@@ -77,6 +75,9 @@ func main() {
 			Todo:    todo,
 		}
 
+		println("end...")
+		println(infoChannel)
+		println(todoChannel)
 		return c.JSON(http.StatusOK, user)
 	})
 
