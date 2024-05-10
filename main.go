@@ -9,32 +9,32 @@ import (
 )
 
 type UserInfo struct {
-	id      string
-	name    string
-	address string
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Address string `json:"address"`
 }
 
 type Todo struct {
-	id      string
-	title   string
-	content string
+	Id      string `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 type User struct {
-	id      string
-	name    string
-	address string
-	todo    Todo
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Address string `json:"address"`
+	Todo    Todo   `json:"todo"`
 }
 
-func GetInfo(duration int, wg *sync.WaitGroup, chanel chan<- UserInfo) {
+func GetInfo(duration int, wg *sync.WaitGroup, channel chan<- UserInfo) {
 	defer wg.Done()
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 
-	chanel <- UserInfo{
-		id:      "f516154d-28d6-41f3-bde7-cc1ad9a88e2e",
-		name:    "山田太郎",
-		address: "〇〇県〇〇市",
+	channel <- UserInfo{
+		Id:      "f516154d-28d6-41f3-bde7-cc1ad9a88e2e",
+		Name:    "山田太郎",
+		Address: "〇〇県〇〇市",
 	}
 
 	println("INFOを読み込みました")
@@ -45,9 +45,9 @@ func GetTodo(duration int, wg *sync.WaitGroup, channel chan<- Todo) {
 	time.Sleep(time.Duration(duration) * time.Millisecond)
 
 	channel <- Todo{
-		id:      "97d2f4eb-3052-4f0d-8bbb-19d12d559933",
-		title:   "TODOその1",
-		content: "TODOその1の内容",
+		Id:      "97d2f4eb-3052-4f0d-8bbb-19d12d559933",
+		Title:   "TODOその1",
+		Content: "TODOその1の内容",
 	}
 
 	println("TODOを読み込みました")
@@ -62,10 +62,10 @@ func main() {
 		println("starting...")
 
 		infoChannel := make(chan UserInfo)
-		go GetInfo(0, &wg, infoChannel)
+		go GetInfo(1000, &wg, infoChannel)
 
 		todoChannel := make(chan Todo)
-		go GetTodo(0, &wg, todoChannel)
+		go GetTodo(2000, &wg, todoChannel)
 
 		wg.Wait()
 		println("end...")
@@ -74,10 +74,10 @@ func main() {
 		todo := <-todoChannel
 
 		user := User{
-			id:      userInfo.id,
-			name:    userInfo.name,
-			address: userInfo.address,
-			todo:    todo,
+			Id:      userInfo.Id,
+			Name:    userInfo.Name,
+			Address: userInfo.Address,
+			Todo:    todo,
 		}
 
 		return c.JSON(http.StatusOK, user)
