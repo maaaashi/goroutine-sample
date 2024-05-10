@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -27,22 +26,24 @@ type User struct {
 	Todo    Todo   `json:"todo"`
 }
 
-func GetInfo(duration int, wg *sync.WaitGroup, channel chan<- UserInfo) {
-	defer wg.Done()
-	time.Sleep(time.Duration(duration) * time.Millisecond)
+func GetInfo(channel chan<- UserInfo) {
+	defer close(channel)
+	time.Sleep(time.Duration(2000) * time.Millisecond)
 
-	channel <- UserInfo{
+	info := UserInfo{
 		Id:      "f516154d-28d6-41f3-bde7-cc1ad9a88e2e",
 		Name:    "山田太郎",
 		Address: "〇〇県〇〇市",
 	}
 
+	channel <- info
+
 	println("INFOを読み込みました")
 }
 
-func GetTodo(duration int, wg *sync.WaitGroup, channel chan<- Todo) {
-	defer wg.Done()
-	time.Sleep(time.Duration(duration) * time.Millisecond)
+func GetTodo(channel chan<- Todo) {
+	defer close(channel)
+	time.Sleep(time.Duration(1000) * time.Millisecond)
 
 	channel <- Todo{
 		Id:      "97d2f4eb-3052-4f0d-8bbb-19d12d559933",
@@ -56,18 +57,14 @@ func GetTodo(duration int, wg *sync.WaitGroup, channel chan<- Todo) {
 func main() {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {
-		var wg sync.WaitGroup
-		wg.Add(2)
-
 		println("starting...")
 
 		infoChannel := make(chan UserInfo)
-		go GetInfo(1000, &wg, infoChannel)
+		go GetInfo(infoChannel)
 
 		todoChannel := make(chan Todo)
-		go GetTodo(2000, &wg, todoChannel)
+		go GetTodo(todoChannel)
 
-		wg.Wait()
 		println("end...")
 
 		userInfo := <-infoChannel
