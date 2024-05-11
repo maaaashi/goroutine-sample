@@ -41,9 +41,11 @@ func GetInfo(channel chan<- UserInfo) {
 	println("INFOを読み込みました")
 }
 
-func GetTodo(channel chan<- Todo) {
+func GetTodo(userId string, channel chan<- Todo) {
 	defer close(channel)
-	time.Sleep(time.Duration(1000) * time.Millisecond)
+	time.Sleep(time.Duration(2000) * time.Millisecond)
+
+	println(userId)
 
 	channel <- Todo{
 		Id:      "97d2f4eb-3052-4f0d-8bbb-19d12d559933",
@@ -62,10 +64,10 @@ func main() {
 		infoChannel := make(chan UserInfo)
 		go GetInfo(infoChannel)
 
-		todoChannel := make(chan Todo)
-		go GetTodo(todoChannel)
-
 		userInfo := <-infoChannel
+		todoChannel := make(chan Todo)
+		go GetTodo(userInfo.Id, todoChannel)
+
 		todo := <-todoChannel
 
 		user := User{
@@ -76,8 +78,6 @@ func main() {
 		}
 
 		println("end...")
-		println(infoChannel)
-		println(todoChannel)
 		return c.JSON(http.StatusOK, user)
 	})
 
