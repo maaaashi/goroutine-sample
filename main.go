@@ -9,6 +9,7 @@ import (
 func main() {
 	e := echo.New()
 	e.GET("/sample", handler.SampleHandler)
+	e.GET("/sample2", handler.Sample2Handler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
